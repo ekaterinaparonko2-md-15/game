@@ -18,6 +18,9 @@ RIGHT_MARGIN = 400
 FALL_THRU_SPEED = -5
 TRIPLE_SHOOT_DURATION = 5  # Продолжительность стрельбы в три стороны (секунды)
 
+# Добавьте изображения для анимации монстров
+ENEMY_TEXTURES = ["images/s1_0.png", "images/s2_0.png", "images/s3_0.png", "images/s4_0.png"]
+
 """ 
 Класс, представляющий игрока.
 Отвечает за управление и обновление состояния игрока, включая передвижение, прыжки, стрельбу и здоровье.
@@ -104,10 +107,15 @@ class Projectile(arcade.Sprite):
 """
 class Enemy(arcade.Sprite):
     def __init__(self, x, y, direction):
-        super().__init__("images/slime_green_10.png", 1)
+        # super().__init__("images/slime_green_10.png", 1)
+        super().__init__(ENEMY_TEXTURES[0], 1)
         self.center_x = x
         self.center_y = y
         self.change_x = ENEMY_SPEED * direction
+        self.textures = [arcade.load_texture(texture) for texture in ENEMY_TEXTURES]
+        self.current_texture = 0
+        self.texture_change_frames = 10
+        self.frame_count = 0
 
     """ 
     Функция обновления состояния врага.
@@ -118,6 +126,11 @@ class Enemy(arcade.Sprite):
         view_left, view_right, view_bottom, view_top = arcade.get_viewport()
         if self.right < view_left or self.left > view_right:
             self.remove_from_sprite_lists()
+
+        self.frame_count += 1
+        if self.frame_count % self.texture_change_frames == 0:
+            self.current_texture = (self.current_texture + 1) % len(self.textures)
+            self.texture = self.textures[self.current_texture]
 
 
 """ 
